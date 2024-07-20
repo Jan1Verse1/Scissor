@@ -2,9 +2,12 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useForm, SubmitHandler } from "react-hook-form";
 import VideoBG from "../../assets/7296058-uhd_2160_4096_30fps.mp4";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { auth } from "../../../src/Firebase-config";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
 
 // Define the form data type
 interface FormData {
@@ -12,36 +15,40 @@ interface FormData {
   password: string;
 }
 
-const SignIn = () => {
+const SignUp = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
-  const navigate = useNavigate();
-  const navigateHandler = () => {
-    navigate("/Dashboard");
-  };
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const onSubmit: SubmitHandler<FormData> = (data) => {
-    signInWithEmailAndPassword(auth, data.email, data.password)
+    createUserWithEmailAndPassword(auth, data.email, data.password)
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
-        console.log("User signed in:", user);
-        navigateHandler();
+        console.log("User signed up:", user);
+
+        // Send verification email
+        sendEmailVerification(user)
+          .then(() => {
+            console.log("Verification email sent.");
+          })
+          .catch((error) => {
+            console.error("Error sending verification email:", error);
+          });
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.error("Error signing in:", errorCode, errorMessage);
+        console.error("Error signing up:", errorCode, errorMessage);
         alert(errorMessage);
       });
   };
 
-  const SignUp = "/SignUp";
+  const SignIn = "/SignIn";
 
   return (
     <div className="flex flex-col py-20 w-auto min-h-screen">
@@ -57,9 +64,9 @@ const SignIn = () => {
           ></video>
         </div>
         <div className="flex flex-col p-3">
-          <h1 className="text-2xl font-bold mb-4">Sign In</h1>
+          <h1 className="text-2xl font-bold mb-4">Sign Up</h1>
           <p className="text-base font-normal mb-4">
-            Kindly provide required details to sign into your account
+            Kindly provide required details to sign up
           </p>
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div>
@@ -97,7 +104,7 @@ const SignIn = () => {
               <input
                 type="password"
                 className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                placeholder="Enter your password"
+                placeholder="Set your password"
                 {...register("password", {
                   required: "Password is required.",
                 })}
@@ -112,12 +119,12 @@ const SignIn = () => {
               type="submit"
               className="w-full py-2 px-4 bg-violet-900 text-white font-semibold rounded-md hover:bg-blue-700"
             >
-              Sign In
+              Sign Up
             </button>
           </form>
           <div>
             <p>
-              Don't have an account? <Link to={SignUp}> Sign Up here</Link>
+              Already have an account? <Link to={SignIn}> Sign In here</Link>
             </p>
           </div>
         </div>
@@ -127,4 +134,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default SignUp;

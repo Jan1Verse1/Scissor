@@ -7,11 +7,13 @@ import {
   faLinkedinIn,
   faXTwitter,
   faInstagram,
+  faGithub,
 } from "@fortawesome/free-brands-svg-icons";
 
 const Footer = () => {
   const X = "https://twitter.com/Jan1Verse1";
   const IG = "https://www.instagram.com/Jan1Verse1/";
+  const Github = "https://github.com/Jan1Verse1";
   const LinkedIn =
     "https://www.linkedin.com/in/adedotun-oluwaseyi-555710100?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app";
 
@@ -46,6 +48,13 @@ const Footer = () => {
               {" "}
               <FontAwesomeIcon
                 icon={faLinkedinIn}
+                className="w-6 h-6 text-white mr-8"
+              />
+            </Link>
+            <Link to={Github} target="_blank">
+              {" "}
+              <FontAwesomeIcon
+                icon={faGithub}
                 className="w-6 h-6 text-white mr-8"
               />
             </Link>

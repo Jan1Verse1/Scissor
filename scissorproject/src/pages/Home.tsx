@@ -22,7 +22,7 @@ const Home = () => {
             </div>
             <div className="col-span-1 flex items-center justify-center p-4 h-full w-full">
               <video
-                className="rounded-[10px] border border-blue-500"
+                className="w-full h-full object-cover rounded-[10px] border border-blue-500"
                 src={VideoBG}
                 autoPlay
                 loop

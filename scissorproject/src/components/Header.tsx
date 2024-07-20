@@ -15,6 +15,13 @@ const Header = () => {
     navigate("/");
   };
 
+  const navigateSignIn = () => {
+    navigate("/SignIn");
+  };
+
+  const navigateSignUp = () => {
+    navigate("/SignUp");
+  };
   return (
     <div>
       <header className="flex flex-row justify-between align-middle px-4 py-4  bg-white border-2 border-gray-800 h-auto w-full fixed top-0">
@@ -29,14 +36,16 @@ const Header = () => {
           </div>
           <div className="md:flex flex-row justify-between">
             <button
-              className="select-none rounded-lg bg-gray-900 py-3 px-6 mx-2 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-gray-900/10 transition-all hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+              className="select-none rounded-lg bg-violet-900  py-3 px-6 mx-2 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-gray-900/10 transition-all hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
               type="button"
+              onClick={navigateSignUp}
             >
               Sign Up
             </button>
             <button
-              className="select-none rounded-lg border border-gray-900 py-3 px-6 mx-2 text-center align-middle font-sans text-xs font-bold uppercase text-gray-900 transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+              className="select-none rounded-lg border border-violet-900  py-3 px-6 mx-2 text-center align-middle font-sans text-xs font-bold uppercase text-violet-900  transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
               type="button"
+              onClick={navigateSignIn}
             >
               Sign In
             </button>
@@ -63,14 +72,16 @@ const Header = () => {
           }
         >
           <button
-            className="select-none rounded-lg bg-gray-900 py-3 px-6 mx-2 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-gray-900/10 transition-all hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            className="select-none rounded-lg bg-violet-900   py-3 px-6 mx-2 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-gray-900/10 transition-all hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
             type="button"
+            onClick={navigateSignUp}
           >
             Sign Up
           </button>
           <button
-            className="select-none rounded-lg border border-gray-900 py-3 px-6 mx-2 text-center align-middle font-sans text-xs font-bold uppercase text-gray-900 transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            className="select-none rounded-lg border border-violet-900  py-3 px-6 mx-2 text-center align-middle font-sans text-xs font-bold uppercase text-violet-900  transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
             type="button"
+            onClick={navigateSignIn}
           >
             Sign In
           </button>
