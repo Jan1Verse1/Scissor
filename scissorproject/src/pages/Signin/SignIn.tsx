@@ -5,6 +5,8 @@ import VideoBG from "../../assets/7296058-uhd_2160_4096_30fps.mp4";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../../../src/Firebase-config";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { ToastContainer, toast, ToastPosition } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Define the form data type
 interface FormData {
@@ -18,6 +20,7 @@ const SignIn = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
+
   const navigate = useNavigate();
   const navigateHandler = () => {
     navigate("/Dashboard");
@@ -37,7 +40,10 @@ const SignIn = () => {
         const errorCode = error.code;
         const errorMessage = error.message;
         console.error("Error signing in:", errorCode, errorMessage);
-        alert(errorMessage);
+        // alert(errorMessage);
+        toast.error(`Error signin you in: ${errorMessage}`, {
+          position: "top-right" as ToastPosition,
+        });
       });
   };
 
@@ -46,10 +52,10 @@ const SignIn = () => {
   return (
     <div className="flex flex-col py-20 w-auto min-h-screen">
       <Header />
-      <div className="p-8 flex flex-row m-7 overflow-hidden ">
-        <div className="col-span-1 flex items-center justify-center p-4 max-w-lg h-[560px]">
+      <div className="grid grid-cols-2 gap-8 p-8 m-7 items-center overflow-hidden">
+        <div className="flex items-center justify-center p-4 max-w-lg h-[560px]">
           <video
-            className="rounded-[10px] border border-blue-500"
+            className="rounded-[10px] border border-blue-500 w-full h-full object-cover"
             src={VideoBG}
             autoPlay
             loop
@@ -110,7 +116,7 @@ const SignIn = () => {
             </div>
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-violet-900 text-white font-semibold rounded-md hover:bg-blue-700"
+              className="w-auto py-2 px-4 bg-violet-900 text-white font-semibold rounded-md hover:bg-violet-500"
             >
               Sign In
             </button>
@@ -121,6 +127,7 @@ const SignIn = () => {
             </p>
           </div>
         </div>
+        <ToastContainer />
       </div>
       <Footer />
     </div>

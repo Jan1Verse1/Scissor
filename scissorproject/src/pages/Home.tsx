@@ -1,6 +1,7 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import VideoBG from "../assets/7296058-uhd_2160_4096_30fps.mp4";
+import ShortenInHome from "../components/ShortenInHome";
 
 const Home = () => {
   return (
@@ -22,7 +23,7 @@ const Home = () => {
             </div>
             <div className="col-span-1 flex items-center justify-center p-4 h-full w-full">
               <video
-                className="w-full h-full object-cover rounded-[10px] border border-blue-500"
+                className="w-auto h-auto object-cover rounded-[10px] border border-blue-500"
                 src={VideoBG}
                 autoPlay
                 loop
@@ -31,6 +32,7 @@ const Home = () => {
             </div>
           </div>
         </div>
+        <ShortenInHome />
         <Footer />
       </div>
     </>
