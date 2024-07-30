@@ -1,13 +1,14 @@
 // import React from "react";
-// import LoginHeader from "../../components/loginHeader";
+import TopBar from "../../components/loginHeader";
 import NavBar from "../../components/Nav";
 
 const Dashboard = () => {
   return (
-    <div className="flex flex-col py-44 w-auto min-h-screen ">
-      {/* <LoginHeader /> */}
+    <div className="flex flex-row px-60 w-full min-h-screen ">
       <NavBar />
       <div>
+        <NavBar />
+        <TopBar />
         <h1>This is the Dashboard</h1>
       </div>
     </div>
