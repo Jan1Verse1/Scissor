@@ -63,7 +63,7 @@ const Footer = () => {
       </div>
       <div className="flex flex-row justify-between border-t-2 border-white pt-10">
         <p className="text-base text-white mb-4 mt-0 list-none font-normal">
-          © 2024 AltSchool Capstone Project. - All Rights Reserved
+          © 2024 AltSchool Capstone Project. - All Rights Reserved!
         </p>
 
         {/* <div className="terms">
