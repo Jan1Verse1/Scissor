@@ -2,6 +2,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import VideoBG from "../assets/7296058-uhd_2160_4096_30fps.mp4";
 import ShortenInHome from "../components/ShortenInHome";
+import FAQs from "../components/Accordion";
 
 const Home = () => {
   return (
@@ -33,6 +34,7 @@ const Home = () => {
           </div>
         </div>
         <ShortenInHome />
+        <FAQs />
         <Footer />
       </div>
     </>

@@ -16,23 +16,37 @@ const ShortenInHome = () => {
   } = useForm<FormData>();
 
   const [shortUrl, setShortUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Function to generate a short code
-  const generateShortCode = (): string => {
-    return Math.random().toString(36).substring(2, 8);
-  };
-
-  // Function to save URL mapping to localStorage
-  const saveUrlMapping = (shortCode: string, longUrl: string) => {
-    localStorage.setItem(shortCode, longUrl);
+  // Function to shorten the URL using the is.gd endpoint
+  const shortenUrl = async (longUrl: string): Promise<string> => {
+    try {
+      const response = await fetch(
+        `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}`
+      );
+      const data = await response.json();
+      return data.shorturl;
+    } catch (err) {
+      throw new Error("Failed to shorten URL");
+    }
   };
 
   // Handle form submission
-  const onSubmit: SubmitHandler<FormData> = (data) => {
-    const shortCode = generateShortCode();
-    saveUrlMapping(shortCode, data.url);
-    setShortUrl(`${window.location.origin}/#/${shortCode}`);
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
+    setError(null);
+    try {
+      const shortUrl = await shortenUrl(data.url);
+      setShortUrl(shortUrl);
+      
+      // Save the URL mapping to localStorage
+      const shortCode = shortUrl.split('/').pop(); // Extract shortCode from URL
+      if (shortCode) {
+        localStorage.setItem(shortCode, data.url);
+      }
+    } catch (err) {
+      setError("Failed to shorten URL. Please try again.");
+    }
   };
 
   // Handle redirects if short code exists
@@ -42,8 +56,11 @@ const ShortenInHome = () => {
       const longUrl = localStorage.getItem(shortCode);
       if (longUrl) {
         window.location.href = longUrl;
+      } else {
+        console.log(`Long URL not found for short code: ${shortCode}`);
       }
     }
+    console.log(`Redirecting from short URL with code - ${shortCode}`);
   };
 
   useEffect(() => {
@@ -112,6 +129,8 @@ const ShortenInHome = () => {
           </button>
         </form>
 
+        {error && <p className="mt-4 text-red-600">{error}</p>}
+
         {shortUrl && (
           <div className="mt-4">
             <p className="text-green-600">Shortened URL:</p>
@@ -120,7 +139,7 @@ const ShortenInHome = () => {
             </a>
             <button
               className="ml-4 bg-violet-900 text-white rounded items-center p-2"
-              onClick={() => navigator.clipboard.writeText(shortUrl)}
+              onClick={() => navigator.clipboard.writeText(shortUrl!)}
             >
               <FontAwesomeIcon
                 icon={faCopy}
