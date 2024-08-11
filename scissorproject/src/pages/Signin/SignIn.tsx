@@ -23,7 +23,7 @@ const SignIn = () => {
 
   const navigate = useNavigate();
   const navigateHandler = () => {
-    navigate("/Dashboard");
+    navigate("/MyURLs");
   };
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

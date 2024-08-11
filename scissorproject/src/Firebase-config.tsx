@@ -8,13 +8,12 @@ import {
   addDoc,
   getDoc,
   doc,
+  query,
+  where,
+  getDocs,
 } from "firebase/firestore";
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyA4-ECIGBOu626wCv183dBgCpOueKAIZCc",
   authDomain: "scissor-c364b.firebaseapp.com",
@@ -29,6 +28,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
-const db = getFirestore(app);
+const db = getFirestore(app); // Initialize Firestore
 
-export { app, analytics, auth, db, collection, addDoc, getDoc, doc };
+export {
+  app,
+  analytics,
+  auth,
+  db,
+  collection,
+  addDoc,
+  getDoc,
+  doc,
+  query,
+  where,
+  getDocs,
+};

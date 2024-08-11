@@ -1,8 +1,8 @@
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 interface FormData {
   url: string;
@@ -17,16 +17,21 @@ const ShortenInHome = () => {
 
   const [shortUrl, setShortUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Function to shorten the URL using the is.gd endpoint
+  // Function to shorten the URL using TinyURL API
   const shortenUrl = async (longUrl: string): Promise<string> => {
     try {
       const response = await fetch(
-        `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}`
+        `https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`
       );
-      const data = await response.json();
-      return data.shorturl;
+
+      if (!response.ok) {
+        throw new Error(`Failed to shorten URL: ${response.statusText}`);
+      }
+
+      return await response.text();
     } catch (err) {
       throw new Error("Failed to shorten URL");
     }
@@ -35,17 +40,22 @@ const ShortenInHome = () => {
   // Handle form submission
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     setError(null);
+    setShortUrl(null);
+    setLoading(true);
+
     try {
       const shortUrl = await shortenUrl(data.url);
       setShortUrl(shortUrl);
-      
+
       // Save the URL mapping to localStorage
-      const shortCode = shortUrl.split('/').pop(); // Extract shortCode from URL
+      const shortCode = shortUrl.split("/").pop(); // Extract shortCode from URL
       if (shortCode) {
         localStorage.setItem(shortCode, data.url);
       }
     } catch (err) {
       setError("Failed to shorten URL. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,12 +70,18 @@ const ShortenInHome = () => {
         console.log(`Long URL not found for short code: ${shortCode}`);
       }
     }
-    console.log(`Redirecting from short URL with code - ${shortCode}`);
   };
 
   useEffect(() => {
     handleRedirect();
   }, []);
+
+  // Copy to clipboard
+  const handleCopy = () => {
+    if (shortUrl) {
+      navigator.clipboard.writeText(shortUrl);
+    }
+  };
 
   // Navigate to Sign Up page
   const navigateSignUp = () => {
@@ -124,29 +140,37 @@ const ShortenInHome = () => {
           <button
             type="submit"
             className="w-auto py-2 px-4 bg-violet-900 text-white font-semibold rounded-md hover:bg-blue-700"
+            disabled={loading}
           >
-            Shorten URL
+            {loading ? "Shortening..." : "Shorten URL"}
           </button>
         </form>
 
         {error && <p className="mt-4 text-red-600">{error}</p>}
 
         {shortUrl && (
-          <div className="mt-4">
-            <p className="text-green-600">Shortened URL:</p>
-            <a href={shortUrl} target="_blank" rel="noopener noreferrer">
-              {shortUrl}
-            </a>
-            <button
-              className="ml-4 bg-violet-900 text-white rounded items-center p-2"
-              onClick={() => navigator.clipboard.writeText(shortUrl!)}
-            >
-              <FontAwesomeIcon
-                icon={faCopy}
-                className="w-6 h-6 text-white mr-2"
-              />
-              Copy
-            </button>
+          <div className="mt-4 flex flex-col items-center">
+            <div className="flex items-center mb-4">
+              <p className="text-blue-500">Shortened URL:</p>
+              <a
+                href={shortUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-2 text-blue-500 underline"
+              >
+                {shortUrl}
+              </a>
+              <button
+                className="ml-4 bg-violet-900 text-white rounded items-center p-2"
+                onClick={handleCopy}
+              >
+                <FontAwesomeIcon
+                  icon={faCopy}
+                  className="w-6 h-6 text-white mr-2"
+                />
+                Copy
+              </button>
+            </div>
           </div>
         )}
       </div>

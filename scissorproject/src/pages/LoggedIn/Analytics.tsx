@@ -1,26 +1,19 @@
 // import React from "react";
 import TopBar from "../../components/loginHeader";
 import NavBar from "../../components/Nav";
-import ShortenedUrlsTable from "../../components/ShortenedURLTable";
-import ShortenIn from "../../components/Shortened";
 
-const Dashboard = () => {
+const Analytics = () => {
   return (
     <div className="flex flex-row  w-full min-h-screen ">
       <NavBar />
       <div className="flex flex-col  w-full min-h-screen">
         <TopBar />
         <div className="flex flex-col  p-6 w-full min-h-screen">
-          <div className="flex w-full border-red-300">
-            <ShortenIn />
-          </div>
-          <div>
-            <ShortenedUrlsTable />
-          </div>
+          <h1>Na your analytics</h1>
         </div>
       </div>
     </div>
   );
 };
 
-export default Dashboard;
+export default Analytics;

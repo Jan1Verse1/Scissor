@@ -1,10 +1,10 @@
 // import React from "react";
 import TopBar from "../../components/loginHeader";
 import NavBar from "../../components/Nav";
+import QRCodeMaker from "../../components/QRCodeGen";
 import ShortenedUrlsTable from "../../components/ShortenedURLTable";
-import ShortenIn from "../../components/Shortened";
 
-const Dashboard = () => {
+const QRCode = () => {
   return (
     <div className="flex flex-row  w-full min-h-screen ">
       <NavBar />
@@ -12,7 +12,7 @@ const Dashboard = () => {
         <TopBar />
         <div className="flex flex-col  p-6 w-full min-h-screen">
           <div className="flex w-full border-red-300">
-            <ShortenIn />
+            <QRCodeMaker />
           </div>
           <div>
             <ShortenedUrlsTable />
@@ -23,4 +23,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default QRCode;
