@@ -1,54 +1,63 @@
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { getUrlsForUser } from "../Firestore-Function"; // Adjust the path as needed
-import { Timestamp } from "firebase/firestore"; // Import Timestamp
+import { useUrls } from "../contexts/URLContexts";
+import { useUser } from "../contexts/UserContexts";
+import { UrlData } from "../Firestore-Function";
+import { onSnapshot, collection, query, where } from "firebase/firestore";
+import { db } from "../Firebase-config";
 
-interface UrlData {
-  id: string;
-  originalUrl: string;
-  shortenedUrl: string;
-  createdAt: Timestamp; // Adjust if createdAt is Date
-}
-
-const ShortenedUrlsTable = () => {
-  const [urls, setUrls] = useState<UrlData[]>([]);
+const ShortenedUrlsTable: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [urls, setUrls] = useState<UrlData[]>([]);
+  const { deleteUrl } = useUrls();
+  const { user } = useUser();
 
   useEffect(() => {
-    const fetchUrls = async () => {
-      try {
-        const userId = "user-id"; // Replace with actual user ID
-        const fetchedUrls = await getUrlsForUser(userId);
-        console.log(`fetchUrls - ${fetchedUrls}`);
+    if (!user) return;
 
-        // Map the fetched data to UrlData format
-        const formattedUrls = fetchedUrls.map((doc: any) => ({
-          id: doc.id,
-          originalUrl: doc.data().originalUrl,
-          shortenedUrl: doc.data().shortenedUrl,
-          createdAt: doc.data().createdAt,
-        }));
+    const urlsRef = collection(db, "urls");
+    const q = query(urlsRef, where("userId", "==", user.uid));
 
-        setUrls(formattedUrls);
-      } catch (error) {
-        setError("Failed to load URLs.");
-      } finally {
+    const unsubscribe = onSnapshot(
+      q,
+      (querySnapshot) => {
+        const urlsData: UrlData[] = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const createdAt = data.createdAt?.toDate();
+          console.log("Fetched document ID:", doc.id); // Debugging line
+          urlsData.push({ id: doc.id, ...data, createdAt } as UrlData);
+        });
+        setUrls(urlsData);
+        setLoading(false);
+      },
+      () => {
+        setError("Failed to fetch URLs.");
         setLoading(false);
       }
-    };
+    );
 
-    fetchUrls();
-  }, []);
+    return () => unsubscribe();
+  }, [user]);
 
   const handleCopy = (shortUrl: string) => {
     navigator.clipboard.writeText(shortUrl);
     alert("Shortened URL copied to clipboard!");
   };
 
-  const handleDelete = (id: string) => {
-    setUrls(urls.filter((url) => url.id !== id));
+  const handleDelete = async (id: string) => {
+    console.log("handleDelete called with ID:", id); // Debugging line
+    if (!id) {
+      console.error("Invalid ID provided for deletion.");
+      return;
+    }
+    try {
+      await deleteUrl(id);
+    } catch (err) {
+      setError("Failed to delete URL.");
+    }
   };
 
   if (loading) {
@@ -75,10 +84,20 @@ const ShortenedUrlsTable = () => {
           {urls.map((url) => (
             <tr key={url.id}>
               <td className="px-4 py-2 border-b">
-                {url.createdAt.toDate().toISOString().split("T")[0]}
+                {url.createdAt
+                  ? url.createdAt.toISOString().split("T")[0]
+                  : "N/A"}
               </td>
-              <td className="px-4 py-2 border-b">{url.originalUrl}</td>
-              <td className="px-4 py-2 border-b">
+              <td className="px-4 py-2 border-b max-w-xs truncate">
+                <a
+                  href={url.originalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {url.originalUrl}
+                </a>
+              </td>
+              <td className="px-4 py-2 border-b max-w-xs truncate">
                 <a
                   href={url.shortenedUrl}
                   target="_blank"
@@ -98,7 +117,10 @@ const ShortenedUrlsTable = () => {
               <td className="px-4 py-2 border-b">
                 <button
                   className="text-red-600 hover:text-red-900"
-                  onClick={() => handleDelete(url.id)}
+                  onClick={() => {
+                    console.log("Deleting URL with ID:", url.id); // Debugging line
+                    handleDelete(url.id);
+                  }}
                 >
                   <FontAwesomeIcon icon={faTrash} />
                 </button>

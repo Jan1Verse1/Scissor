@@ -1,58 +1,45 @@
+// src/pages/LoggedIn/ShortenIn.tsx
+import React, { useState, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useEffect, useState } from "react";
-import { addUrl } from "../Firestore-Function"; // Corrected import statement
+import { addUrl } from "../Firestore-Function";
+import { useUser } from "../contexts/UserContexts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy } from "@fortawesome/free-solid-svg-icons";
-import { getAuth, onAuthStateChanged, User } from "firebase/auth"; // Import Firebase Auth functions
 
 interface FormData {
   url: string;
 }
 
-const ShortenIn = () => {
+const ShortenIn: React.FC = () => {
+  const { user } = useUser();
+
+  useEffect(() => {
+    console.log("Current user:", user);
+  }, [user]);
+
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<FormData>();
-
   const [shortUrl, setShortUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<User | null>(null); // State to track the logged-in user
 
-  const auth = getAuth(); // Initialize Firebase Auth
-
-  // Set up an auth state listener to track the logged-in user
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, [auth]);
-
-  // Function to shorten the URL using TinyURL API
   const shortenUrl = async (longUrl: string): Promise<string> => {
     try {
       const response = await fetch(
         `https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`
       );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`Error: ${response.status} - ${response.statusText}`);
-        console.error(`Response Text: ${errorText}`);
-        throw new Error("Failed to fetch shortened URL.");
-      }
-
+      if (!response.ok) throw new Error("Failed to fetch shortened URL.");
       return await response.text();
     } catch (err) {
-      console.error("Caught error in shortenUrl:", err);
+      console.error("Error shortening URL:", err);
       throw new Error("Failed to shorten URL");
     }
   };
 
-  // Handle form submission
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     setError(null);
     setLoading(true);
@@ -62,40 +49,36 @@ const ShortenIn = () => {
       setShortUrl(shortUrl);
 
       if (user) {
-        // Save the URL mapping to Firestore
         await addUrl(user.uid, data.url, shortUrl);
       } else {
         console.log("User not logged in");
       }
 
-      // Optionally save the URL mapping to localStorage as a fallback
-      const shortCode = shortUrl.split("/").pop(); // Extract shortCode from URL
-      if (shortCode) {
-        localStorage.setItem(shortCode, data.url);
-      }
+      const shortCode = shortUrl.split("/").pop();
+      if (shortCode) localStorage.setItem(shortCode, data.url);
     } catch (err) {
       setError("Failed to shorten URL. Please try again.");
     } finally {
       setLoading(false);
     }
+    reset();
   };
 
-  // Handle redirects if short code exists
   const handleRedirect = () => {
     const shortCode = window.location.hash.substring(2);
     if (shortCode) {
       const longUrl = localStorage.getItem(shortCode);
-      if (longUrl) {
-        window.location.href = longUrl;
-      } else {
-        console.log(`Long URL not found for short code: ${shortCode}`);
-      }
+      if (longUrl) window.location.href = longUrl;
     }
   };
 
   useEffect(() => {
     handleRedirect();
   }, []);
+
+  if (!user) {
+    return <p>Please log in to shorten URLs.</p>;
+  }
 
   return (
     <div className="bg-white border-2 w-4/5 p-10 mb-16 rounded-3xl">
@@ -162,15 +145,13 @@ const ShortenIn = () => {
             <button
               className="ml-4 bg-violet-900 text-white rounded items-center p-2"
               onClick={() => {
-                if (shortUrl) {
-                  navigator.clipboard.writeText(shortUrl);
-                }
+                if (shortUrl) navigator.clipboard.writeText(shortUrl);
               }}
             >
               <FontAwesomeIcon
                 icon={faCopy}
                 className="w-6 h-6 text-white mr-2"
-              />
+              />{" "}
               Copy
             </button>
           </div>

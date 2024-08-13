@@ -2,7 +2,8 @@
 import TopBar from "../../components/loginHeader";
 import NavBar from "../../components/Nav";
 import QRCodeMaker from "../../components/QRCodeGen";
-import ShortenedUrlsTable from "../../components/ShortenedURLTable";
+//import ShortenedUrlsTable from "../../components/ShortenedURLTable";
+import QRCodeTable from "../../components/QRCodeCard";
 
 const QRCode = () => {
   return (
@@ -15,7 +16,7 @@ const QRCode = () => {
             <QRCodeMaker />
           </div>
           <div>
-            <ShortenedUrlsTable />
+            <QRCodeTable />
           </div>
         </div>
       </div>

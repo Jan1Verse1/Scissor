@@ -1,7 +1,5 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useState, useEffect } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy } from "@fortawesome/free-solid-svg-icons";
 import { QRCodeSVG } from "qrcode.react";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth"; // Import Firebase Auth functions
 import { saveQRCode } from "../Firestore-Function"; // Import Firestore function
@@ -28,6 +26,7 @@ const QRCodeMaker = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      console.log("Current user:", currentUser); // Log the current user
     });
     return () => unsubscribe();
   }, [auth]);
@@ -111,31 +110,6 @@ const QRCodeMaker = () => {
         <div className="mt-4 flex flex-col items-center">
           <div className="mb-4">
             <QRCodeSVG value={qrCodeUrl} size={256} /> {/* Generate QR code */}
-          </div>
-          <div className="flex items-center">
-            <p className="text-blue-500">QR Code for:</p>
-            <a
-              href={qrCodeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ml-2 text-blue-500 underline"
-            >
-              {qrCodeUrl}
-            </a>
-            <button
-              className="ml-4 bg-violet-900 text-white rounded items-center p-2"
-              onClick={() => {
-                if (qrCodeUrl) {
-                  navigator.clipboard.writeText(qrCodeUrl);
-                }
-              }}
-            >
-              <FontAwesomeIcon
-                icon={faCopy}
-                className="w-6 h-6 text-white mr-2"
-              />
-              Copy
-            </button>
           </div>
         </div>
       )}
