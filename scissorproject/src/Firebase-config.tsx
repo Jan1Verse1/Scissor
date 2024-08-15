@@ -11,6 +11,7 @@ import {
   query,
   where,
   getDocs,
+  Timestamp,
 } from "firebase/firestore";
 
 // Your web app's Firebase configuration
@@ -42,4 +43,5 @@ export {
   query,
   where,
   getDocs,
+  Timestamp,
 };

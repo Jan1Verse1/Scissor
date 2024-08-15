@@ -6,7 +6,7 @@ import React, {
   useEffect,
 } from "react";
 import { onSnapshot, collection, query, where } from "firebase/firestore";
-import { db } from "../Firebase-config";
+import { db, Timestamp } from "../Firebase-config"; // Import Timestamp directly
 import { useUser } from "./UserContexts";
 
 interface QRCode {
@@ -14,7 +14,7 @@ interface QRCode {
   url: string;
   qrCodeData: string;
   originalUrl: string;
-  createdAt: firebase.firestore.Timestamp;
+  createdAt: Timestamp; // Use Timestamp directly
 }
 
 interface QRCodeContextProps {
@@ -47,7 +47,7 @@ export const QRCodeProvider: React.FC<{ children: ReactNode }> = ({
             url: data.url,
             qrCodeData: data.qrCodeData,
             originalUrl: data.originalUrl,
-            createdAt: data.createdAt,
+            createdAt: data.createdAt, // This is now correctly typed as Timestamp
           });
         });
         setQrCodes(qrCodesData);
