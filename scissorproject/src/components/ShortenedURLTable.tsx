@@ -15,10 +15,16 @@ const ShortenedUrlsTable: React.FC = () => {
   const { user } = useUser();
 
   useEffect(() => {
+    console.log("Use Urls: " + useUrls);
+  });
+
+  useEffect(() => {
     if (!user) return;
 
     const urlsRef = collection(db, "urls");
     const q = query(urlsRef, where("userId", "==", user.uid));
+
+    console.log("This is the user id: " + user.uid);
 
     const unsubscribe = onSnapshot(
       q,
@@ -118,6 +124,7 @@ const ShortenedUrlsTable: React.FC = () => {
                 <button
                   className="text-red-600 hover:text-red-900"
                   onClick={() => {
+                    console.log("Let's delete a url:"); // Debugging line
                     console.log("Deleting URL with ID:", url.id); // Debugging line
                     handleDelete(url.id);
                   }}

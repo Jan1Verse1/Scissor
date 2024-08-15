@@ -31,7 +31,7 @@ export const UrlsProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  // Function to delete a URL from Firestore
+  //Function to delete a URL from Firestore
   const deleteUrl = async (id: string) => {
     try {
       console.log("Calling deleteUrl with ID:", id); // Debugging line

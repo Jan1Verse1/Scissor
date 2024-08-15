@@ -83,7 +83,7 @@ export const saveQRCode = async (
   }
 };
 
-// Function to delete a URL by its ID
+//Function to delete a URL by its ID
 export const deleteUrlFromFirestore = async (id: string): Promise<void> => {
   try {
     console.log("Deleting URL with ID:", id); // Debugging line

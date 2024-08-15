@@ -6,12 +6,15 @@ import React, {
   useEffect,
 } from "react";
 import { onSnapshot, collection, query, where } from "firebase/firestore";
-import { db } from "../Firebase-config"; // Import your Firestore configuration
-import { useUser } from "./UserContexts"; // Import the useUser hook
+import { db } from "../Firebase-config";
+import { useUser } from "./UserContexts";
 
 interface QRCode {
+  id: string;
   url: string;
   qrCodeData: string;
+  originalUrl: string;
+  createdAt: firebase.firestore.Timestamp;
 }
 
 interface QRCodeContextProps {
@@ -23,14 +26,14 @@ const QRCodeContext = createContext<QRCodeContextProps | undefined>(undefined);
 export const QRCodeProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const { user } = useUser(); // Get user from UserContext
+  const { user } = useUser();
   const [qrCodes, setQrCodes] = useState<QRCode[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
 
-    const qrCodesRef = collection(db, "qrCodes"); // Assuming qrCodes is the collection name
+    const qrCodesRef = collection(db, "qrCodes");
     const q = query(qrCodesRef, where("userId", "==", user.uid));
 
     const unsubscribe = onSnapshot(
@@ -40,12 +43,15 @@ export const QRCodeProvider: React.FC<{ children: ReactNode }> = ({
         querySnapshot.forEach((doc) => {
           const data = doc.data();
           qrCodesData.push({
+            id: doc.id, // Use document ID as the QR code ID
             url: data.url,
             qrCodeData: data.qrCodeData,
+            originalUrl: data.originalUrl,
+            createdAt: data.createdAt,
           });
         });
         setQrCodes(qrCodesData);
-        setError(null); // Clear any previous error
+        setError(null);
       },
       (error) => {
         setError("Failed to fetch QR codes.");
@@ -53,7 +59,6 @@ export const QRCodeProvider: React.FC<{ children: ReactNode }> = ({
       }
     );
 
-    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, [user]);
 
@@ -65,7 +70,6 @@ export const QRCodeProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
-// Custom hook to use QRCode context
 export const useQRCode = (): QRCodeContextProps => {
   const context = useContext(QRCodeContext);
   if (!context) {

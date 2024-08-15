@@ -29,7 +29,7 @@ export const FAQAccordionData = [
   {
     Question: "How much are the charges?",
     Answer:
-      "Charges are NOT deducted on our services. This is 100% free of charge. ",
+      "Charges are NOT deducted on our services. This is 100% free of charge. However, we encouurage users to sign up and create account with us. You can also refer our websote to other users. Thank you. ",
   },
   {
     Question:
