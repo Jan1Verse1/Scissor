@@ -6,19 +6,23 @@ import React, {
   useEffect,
 } from "react";
 import { onSnapshot, collection, query, where } from "firebase/firestore";
-import { db, Timestamp } from "../Firebase-config"; // Import Timestamp directly
+import { db } from "../Firebase-config";
 import { useUser } from "./UserContexts";
+import { trackQRCodeScan } from "../Firestore-Function"; // Import the tracking function
 
 interface QRCode {
   id: string;
   url: string;
   qrCodeData: string;
   originalUrl: string;
-  createdAt: Timestamp; // Use Timestamp directly
+  createdAt: any; // Use any for simplicity if Timestamp is directly imported
+  clickCount: number;
+  trafficSources: string[];
 }
 
 interface QRCodeContextProps {
   qrCodes: QRCode[];
+  handleQRCodeScan: (qrCodeId: string, source: string) => Promise<void>; // New function to handle QR code scans
 }
 
 const QRCodeContext = createContext<QRCodeContextProps | undefined>(undefined);
@@ -43,11 +47,13 @@ export const QRCodeProvider: React.FC<{ children: ReactNode }> = ({
         querySnapshot.forEach((doc) => {
           const data = doc.data();
           qrCodesData.push({
-            id: doc.id, // Use document ID as the QR code ID
+            id: doc.id,
             url: data.url,
             qrCodeData: data.qrCodeData,
             originalUrl: data.originalUrl,
-            createdAt: data.createdAt, // This is now correctly typed as Timestamp
+            createdAt: data.createdAt,
+            clickCount: data.clickCount || 0,
+            trafficSources: data.trafficSources || [],
           });
         });
         setQrCodes(qrCodesData);
@@ -62,14 +68,36 @@ export const QRCodeProvider: React.FC<{ children: ReactNode }> = ({
     return () => unsubscribe();
   }, [user]);
 
+  // Function to handle QR code scan tracking
+  const handleQRCodeScan = async (qrCodeId: string, source: string) => {
+    try {
+      await trackQRCodeScan(qrCodeId, source);
+      // Optionally, update the local state to reflect the new scan count
+      setQrCodes((prevQRcodes) =>
+        prevQRcodes.map((qrCode) =>
+          qrCode.id === qrCodeId
+            ? {
+                ...qrCode,
+                clickCount: qrCode.clickCount + 1,
+                trafficSources: [...qrCode.trafficSources, source],
+              }
+            : qrCode
+        )
+      );
+    } catch (error) {
+      console.error("Error tracking QR code scan:", error);
+    }
+  };
+
   return (
-    <QRCodeContext.Provider value={{ qrCodes }}>
+    <QRCodeContext.Provider value={{ qrCodes, handleQRCodeScan }}>
       {error && <p className="text-red-600">{error}</p>}
       {children}
     </QRCodeContext.Provider>
   );
 };
 
+// Custom hook to use QRCode context
 export const useQRCode = (): QRCodeContextProps => {
   const context = useContext(QRCodeContext);
   if (!context) {

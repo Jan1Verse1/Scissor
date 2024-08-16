@@ -1,6 +1,7 @@
 // import React from "react";
 import TopBar from "../../components/loginHeader";
 import NavBar from "../../components/Nav";
+import AnalyticsPage from "../../components/Analytics";
 
 const Analytics = () => {
   return (
@@ -10,6 +11,7 @@ const Analytics = () => {
         <TopBar />
         <div className="flex flex-col  p-6 w-full min-h-screen">
           <h1>Na your analytics</h1>
+          <AnalyticsPage />
         </div>
       </div>
     </div>

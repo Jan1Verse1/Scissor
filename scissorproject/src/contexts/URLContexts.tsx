@@ -1,16 +1,17 @@
-// src/contexts/URLContexts.tsx
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import {
   UrlData,
   getUrlsForUser,
   deleteUrlFromFirestore,
+  trackUrlClick, // Import the tracking function
 } from "../Firestore-Function"; // Adjust the import path as needed
-import { useUser } from "./UserContexts"; // Import the useUser hook
+import { useUser } from "./UserContexts";
 
 interface UrlsContextProps {
   urls: UrlData[];
   refetchUrls: (userId: string) => Promise<void>;
   deleteUrl: (id: string) => Promise<void>;
+  handleUrlClick: (urlId: string, source: string) => Promise<void>; // New function to handle URL clicks
 }
 
 const UrlsContext = createContext<UrlsContextProps | undefined>(undefined);
@@ -18,10 +19,9 @@ const UrlsContext = createContext<UrlsContextProps | undefined>(undefined);
 export const UrlsProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const { user } = useUser(); // Get user from UserContext
+  const { user } = useUser();
   const [urls, setUrls] = useState<UrlData[]>([]);
 
-  // Function to refetch URLs from Firestore for a given userId
   const refetchUrls = async (userId: string) => {
     try {
       const fetchedUrls = await getUrlsForUser(userId);
@@ -31,10 +31,8 @@ export const UrlsProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  //Function to delete a URL from Firestore
   const deleteUrl = async (id: string) => {
     try {
-      console.log("Calling deleteUrl with ID:", id); // Debugging line
       await deleteUrlFromFirestore(id);
       setUrls(urls.filter((url) => url.id !== id));
     } catch (error) {
@@ -42,7 +40,27 @@ export const UrlsProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  // Fetch URLs on mount and when user changes
+  // Function to handle URL click tracking
+  const handleUrlClick = async (urlId: string, source: string) => {
+    try {
+      await trackUrlClick(urlId, source);
+      // Optionally, you could update the click count locally to avoid refetching
+      setUrls((prevUrls) =>
+        prevUrls.map((url) =>
+          url.id === urlId
+            ? {
+                ...url,
+                clickCount: url.clickCount + 1,
+                trafficSources: [...url.trafficSources, source],
+              }
+            : url
+        )
+      );
+    } catch (error) {
+      console.error("Error tracking URL click:", error);
+    }
+  };
+
   React.useEffect(() => {
     if (user) {
       refetchUrls(user.uid);
@@ -50,7 +68,9 @@ export const UrlsProvider: React.FC<{ children: ReactNode }> = ({
   }, [user]);
 
   return (
-    <UrlsContext.Provider value={{ urls, refetchUrls, deleteUrl }}>
+    <UrlsContext.Provider
+      value={{ urls, refetchUrls, deleteUrl, handleUrlClick }}
+    >
       {children}
     </UrlsContext.Provider>
   );
