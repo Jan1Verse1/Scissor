@@ -18,6 +18,7 @@ const ShortenInHome = () => {
   const [shortUrl, setShortUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [shortenedCount, setShortenedCount] = useState<number>(0); // Track shortened URL count
   const navigate = useNavigate();
 
   // Function to shorten the URL using TinyURL API
@@ -39,6 +40,14 @@ const ShortenInHome = () => {
 
   // Handle form submission
   const onSubmit: SubmitHandler<FormData> = async (data) => {
+    if (shortenedCount >= 3) {
+      alert(
+        "You have reached the limit of shortening URLs. Please sign up or sign in to continue."
+      );
+      navigate("/signup"); // Redirect to sign-up page
+      return;
+    }
+
     setError(null);
     setShortUrl(null);
     setLoading(true);
@@ -52,12 +61,24 @@ const ShortenInHome = () => {
       if (shortCode) {
         localStorage.setItem(shortCode, data.url);
       }
+
+      // Update the shortened count
+      const newCount = shortenedCount + 1;
+      console.log("newCount: " + newCount);
+      setShortenedCount(newCount);
+      localStorage.setItem("shortenedCount", newCount.toString()); // Save to localStorage
     } catch (err) {
       setError("Failed to shorten URL. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
+  // Load the shortened count from localStorage on component mount
+  useEffect(() => {
+    const count = parseInt(localStorage.getItem("shortenedCount") || "0", 10);
+    setShortenedCount(count);
+  }, []);
 
   // Handle redirects if short code exists
   const handleRedirect = () => {

@@ -123,12 +123,20 @@ const SignIn = () => {
             </button>
           </form>
           <div>
-            <p>
-              Forgot Password? <Link to={Password}> Click here </Link> to reset
-              your password
+            <p className="mb-4 mt-4">
+              Forgot Password?{" "}
+              <Link className=" text-red-900" to={Password}>
+                {" "}
+                Click here{" "}
+              </Link>{" "}
+              to reset your password
             </p>
-            <p>
-              Don't have an account? <Link to={SignUp}> Sign Up here</Link>
+            <p className="mb-4">
+              Don't have an account?{" "}
+              <Link className=" text-violet-900" to={SignUp}>
+                {" "}
+                Sign Up here
+              </Link>
             </p>
           </div>
         </div>

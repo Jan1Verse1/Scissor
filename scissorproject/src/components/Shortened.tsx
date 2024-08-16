@@ -61,7 +61,7 @@ const ShortenIn: React.FC = () => {
     } finally {
       setLoading(false);
     }
-    reset();
+    // reset();
   };
 
   const handleRedirect = () => {
@@ -70,6 +70,13 @@ const ShortenIn: React.FC = () => {
       const longUrl = localStorage.getItem(shortCode);
       if (longUrl) window.location.href = longUrl;
     }
+  };
+
+  // Reset handler
+  const handleReset = () => {
+    reset(); // Reset the form input
+    setShortUrl(null); // Clear the displayed QR code
+    setError(null); // Clear any existing error messages
   };
 
   useEffect(() => {
@@ -82,14 +89,14 @@ const ShortenIn: React.FC = () => {
 
   return (
     <div className="bg-white border-2 w-4/5 p-10 mb-16 rounded-3xl">
-      <div className="flex flex-col mb-4">
+      {/* <div className="flex flex-col mb-4">
         <h4 className="text-2xl font-medium text-gray-400">
           Shorten a long link
         </h4>
         <h6 className="text-4xl font-semibold">
           Provide us with your very long URL
         </h6>
-      </div>
+      </div> */}
 
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div>
@@ -125,6 +132,13 @@ const ShortenIn: React.FC = () => {
           disabled={loading}
         >
           {loading ? "Shortening..." : "Shorten URL"}
+        </button>
+        <button
+          type="button"
+          className="w-auto py-2 px-4 mr-8 text-red-500 font-semibold "
+          onClick={handleReset}
+        >
+          Reset
         </button>
       </form>
 

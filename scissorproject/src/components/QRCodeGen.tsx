@@ -12,6 +12,7 @@ const QRCodeMaker = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<FormData>();
 
@@ -56,16 +57,23 @@ const QRCodeMaker = () => {
     }
   };
 
+  // Reset handler
+  const handleReset = () => {
+    reset(); // Reset the form input
+    setQrCodeUrl(null); // Clear the displayed QR code
+    setError(null); // Clear any existing error messages
+  };
+
   return (
     <div className="bg-white border-2 w-4/5 p-10 mb-16 rounded-3xl">
-      <div className="flex flex-col mb-4">
+      {/* <div className="flex flex-col mb-4">
         <h4 className="text-2xl font-medium text-gray-400">
           Generate a QR Code
         </h4>
         <h6 className="text-4xl font-semibold">
           Provide us with your URL to generate a QR Code
         </h6>
-      </div>
+      </div> */}
 
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div>
@@ -101,6 +109,13 @@ const QRCodeMaker = () => {
           disabled={loading}
         >
           {loading ? "Generating..." : "Generate QR Code"}
+        </button>
+        <button
+          type="button"
+          className="w-auto py-2 px-4 mr-8 text-red-500 font-semibold "
+          onClick={handleReset}
+        >
+          Reset
         </button>
       </form>
 

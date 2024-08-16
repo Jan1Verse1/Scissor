@@ -12,6 +12,9 @@ import {
   where,
   getDocs,
   Timestamp,
+  updateDoc,
+  increment,
+  arrayUnion,
 } from "firebase/firestore";
 
 // Your web app's Firebase configuration
@@ -44,4 +47,7 @@ export {
   where,
   getDocs,
   Timestamp,
+  updateDoc,
+  increment,
+  arrayUnion,
 };

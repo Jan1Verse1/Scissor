@@ -93,11 +93,17 @@ const PasswordReset = () => {
             </button>
           </form>
           <div>
-            <p>
-              Remember your password? <Link to="/SignIn">Sign In here</Link>
+            <p className="mb-4 mt-4">
+              Remember your password?{" "}
+              <Link className=" text-violet-900" to="/SignIn">
+                Sign In here
+              </Link>
             </p>
-            <p>
-              Don't have an account? <Link to={SignUp}>Sign Up here</Link>
+            <p className="mb-4">
+              Don't have an account?{" "}
+              <Link className=" text-violet-900" to={SignUp}>
+                Sign Up here
+              </Link>
             </p>
           </div>
         </div>

@@ -1,30 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { useUrls } from "../contexts/URLContexts";
+import {
+  faCopy,
+  faChevronLeft,
+  faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
 import { useUser } from "../contexts/UserContexts";
 import { UrlData } from "../Firestore-Function";
 import { onSnapshot, collection, query, where } from "firebase/firestore";
 import { db } from "../Firebase-config";
+import { ToastContainer, toast, ToastPosition } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+const ITEMS_PER_PAGE = 10; // Number of items per page
 
 const ShortenedUrlsTable: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [urls, setUrls] = useState<UrlData[]>([]);
-  const { deleteUrl } = useUrls();
-  const { user } = useUser();
+  const [currentPage, setCurrentPage] = useState<number>(1); // Current page state
 
-  useEffect(() => {
-    console.log("Use Urls: " + useUrls);
-  });
+  const { user } = useUser();
 
   useEffect(() => {
     if (!user) return;
 
     const urlsRef = collection(db, "urls");
     const q = query(urlsRef, where("userId", "==", user.uid));
-
-    console.log("This is the user id: " + user.uid);
 
     const unsubscribe = onSnapshot(
       q,
@@ -33,7 +35,6 @@ const ShortenedUrlsTable: React.FC = () => {
         querySnapshot.forEach((doc) => {
           const data = doc.data();
           const createdAt = data.createdAt?.toDate();
-          console.log("Fetched document ID:", doc.id); // Debugging line
           urlsData.push({ id: doc.id, ...data, createdAt } as UrlData);
         });
         setUrls(urlsData);
@@ -50,20 +51,19 @@ const ShortenedUrlsTable: React.FC = () => {
 
   const handleCopy = (shortUrl: string) => {
     navigator.clipboard.writeText(shortUrl);
-    alert("Shortened URL copied to clipboard!");
+    toast.success("Shortened URL copied to clipboard!", {
+      position: "top-right" as ToastPosition,
+    });
   };
 
-  const handleDelete = async (id: string) => {
-    console.log("handleDelete called with ID:", id); // Debugging line
-    if (!id) {
-      console.error("Invalid ID provided for deletion.");
-      return;
-    }
-    try {
-      await deleteUrl(id);
-    } catch (err) {
-      setError("Failed to delete URL.");
-    }
+  // Calculate the indexes for slicing
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedUrls = urls.slice(startIndex, endIndex);
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   if (loading) {
@@ -83,11 +83,10 @@ const ShortenedUrlsTable: React.FC = () => {
             <th className="px-4 py-2 border-b">Long URL</th>
             <th className="px-4 py-2 border-b">Shortened URL</th>
             <th className="px-4 py-2 border-b"></th>
-            <th className="px-4 py-2 border-b"></th>
           </tr>
         </thead>
         <tbody>
-          {urls.map((url) => (
+          {paginatedUrls.map((url) => (
             <tr key={url.id}>
               <td className="px-4 py-2 border-b">
                 {url.createdAt
@@ -114,28 +113,39 @@ const ShortenedUrlsTable: React.FC = () => {
               </td>
               <td className="px-4 py-2 border-b">
                 <button
-                  className="text-blue-600 hover:text-blue-900"
+                  className="text-violet-500 hover:text-blue-900"
                   onClick={() => handleCopy(url.shortenedUrl)}
                 >
                   <FontAwesomeIcon icon={faCopy} />
-                </button>
-              </td>
-              <td className="px-4 py-2 border-b">
-                <button
-                  className="text-red-600 hover:text-red-900"
-                  onClick={() => {
-                    console.log("Let's delete a url:"); // Debugging line
-                    console.log("Deleting URL with ID:", url.id); // Debugging line
-                    handleDelete(url.id);
-                  }}
-                >
-                  <FontAwesomeIcon icon={faTrash} />
                 </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {/* Pagination Controls */}
+      <div className="flex justify-end mt-4">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-violet-500 text-white rounded-l-md "
+        >
+          <FontAwesomeIcon icon={faChevronLeft} />
+        </button>
+        <span className="px-4 py-2">
+          Page {currentPage} of {Math.ceil(urls.length / ITEMS_PER_PAGE)}
+        </span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage * ITEMS_PER_PAGE >= urls.length}
+          className="px-4 py-2 bg-violet-500 text-white rounded-r-md "
+        >
+          <FontAwesomeIcon icon={faChevronRight} />
+        </button>
+      </div>
+
+      <ToastContainer />
     </div>
   );
 };
